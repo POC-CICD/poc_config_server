@@ -1,0 +1,37 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: config-server-green
+  namespace: default
+  labels:
+    name: config-server
+    service: config-server-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: config-server
+      type: backend
+  template:
+    metadata:
+      labels:
+        name: config-server
+        type: backend
+        version:
+        deploymentType: GREEN
+    spec:
+      containers:
+      - name: config-server
+        image: nisumpk/config_server
+        ports:
+        - containerPort: 8001
+        env:
+        - name: GIT_CONFIG_DIRECTORY
+          value: "-Dspring.cloud.config.server.git.searchPaths: cloudstack"
+        - name: SERVER_PORT
+          value: "-Dserver.port=8001"
+        - name: DISCOVERY_SERVER_URL
+          value: "-Deureka.client.serviceUrl.defaultZone=http://discovery-server-service:7001/eureka/"
+        command: ["java"]
+        args: ["$(SERVER_PORT)", "$(DISCOVERY_SERVER_URL)", "$(GIT_CONFIG_DIRECTORY)", "-Deureka.instance.preferIpAddress=true", "-Deureka.instance.ipAddress=config-server-service", "-jar", "/usr/src/config-server-SNAPSHOT.jar"]
+
