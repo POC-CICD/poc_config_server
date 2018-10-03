@@ -17,7 +17,7 @@ spec:
       labels:
         name: config-server
         type: backend
-        version:
+        version: "1"
         deploymentType: GREEN
     spec:
       containers:
