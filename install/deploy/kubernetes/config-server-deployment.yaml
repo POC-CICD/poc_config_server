@@ -2,7 +2,7 @@ apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
   name: config-server
-  namespace: default
+  namespace: devopspoc
   labels:
     name: config-server
     service: config-server-service
@@ -33,7 +33,7 @@ spec:
         - name: SERVER_PORT
           value: "-Dserver.port=8001"
         - name: DISCOVERY_SERVER_URL
-          value: "-Deureka.client.serviceUrl.defaultZone=http://discovery-server-service.default.svc.cluster.local:7001/eureka/"
+          value: "-Deureka.client.serviceUrl.defaultZone=http://discovery-server-service.devopspoc.svc.cluster.local:7001/eureka/"
         command: ["java"]
         args: ["$(SERVER_PORT)", "$(DISCOVERY_SERVER_URL)", "$(GIT_CONFIG_DIRECTORY)", "-Deureka.instance.preferIpAddress=true", "-Deureka.instance.ipAddress=$(MY_POD_IP)", "-jar", "/usr/src/config-server-SNAPSHOT.jar"]
 ---
@@ -41,7 +41,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: config-server-service
-  namespace: default
+  namespace: devopspoc
   labels:
     name: config-server-service
 spec:

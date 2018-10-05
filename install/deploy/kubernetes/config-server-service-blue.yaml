@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: config-server-service
-  namespace: default
+  namespace: devopspoc
   labels:
     name: config-server-service
 spec:

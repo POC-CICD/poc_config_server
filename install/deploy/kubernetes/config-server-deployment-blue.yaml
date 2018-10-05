@@ -2,7 +2,7 @@ apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
   name: config-server-blue
-  namespace: default
+  namespace: devopspoc
   labels:
     name: config-server
     service: config-server-service
