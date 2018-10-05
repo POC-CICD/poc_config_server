@@ -35,10 +35,6 @@ spec:
         ports:
         - containerPort: 8001
         env:
-        - name: MY_POD_IP
-          valueFrom:
-            fieldRef:
-              fieldPath: status.podIP
         - name: GIT_CONFIG_DIRECTORY
           value: "-Dspring.cloud.config.server.git.searchPaths: cloudstack"
         - name: SERVER_PORT
@@ -47,6 +43,16 @@ spec:
           value: "-Deureka.client.serviceUrl.defaultZone=http://discovery-server-service.ru-deployment.svc.cluster.local:7001/eureka/"
         command: ["java"]
         args: ["$(SERVER_PORT)", "$(DISCOVERY_SERVER_URL)", "$(GIT_CONFIG_DIRECTORY)", "-Deureka.instance.preferIpAddress=true", "-Deureka.instance.ipAddress=$(MY_POD_IP)", "-jar", "/usr/src/config-server-SNAPSHOT.jar"]
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 20
 ---
 apiVersion: v1
 kind: Service
