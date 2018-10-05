@@ -1,51 +1,24 @@
-def deployedValue = ''
+def deployingValue = ''
 
-//def app = 'admin-application'
-
-def currentDeployedValue(namespace, firstStack, secondStack, app) {
+def currentDeployingValue(namespace, blue, green, app) {
         script {
-            podStatus = sh (returnStatus: true, script: "kubectl describe svc " + app + "-service -n ${namespace}| grep Selector |awk '{ print \$2 }' | cut -d'=' -f2 | cut -d',' -f1 &> value.txt")
+            podStatus = sh (returnStatus: true, script: "kubectl describe svc " + app + "-service -n " + namespace + "| grep -i Selector | cut -d'=' -f2 | cut -d',' -f1 &> value.txt")
             getValue = readFile('value.txt').trim()
 
-            if (getValue.toLowerCase().equals(firstStack.toLowerCase())) {
+            if (getValue.toLowerCase().equals(blue.toLowerCase())) {
                 println "Currently " + getValue + " " + app + " is running!"
-                deployedValue = secondStack.toUpperCase()
-            } else if (getValue.toLowerCase().equals(secondStack.toLowerCase())) {
+                deployingValue = green
+            } else if (getValue.toLowerCase().equals(green.toLowerCase())) {
                 println "Currently " + getValue + " " + app + " is running!"
-                deployedValue = firstStack.toUpperCase()
-            } //else if (getValue.toLowerCase().contains("NotFound".toLowerCase())) {
-               // println "The current application " + app + " is not installed, skipping cleanup step!"
-            //}
-            else {
-                println "The current application " + app + " is not installed, now deploying app for blue by default!"
-                deployedValue = 'blue'
-                //error ("Value got from configuration doesn't qualify any Blue/Green deployment! This mean it should be GREEN or BLUE or QA etc.")
+                deployingValue = blue
+            } else {
+                println "The application " + app + " is not running, now deploying app for blue by default!"
+                deployingValue = 'blue'
             }
 
-            println "Now deploying " + deployedValue.toUpperCase() + "!"
-            //deployedValue.split('_')[0].toLowerCase()
-            deployedValue
+            println "Now deploying " + deployingValue.toUpperCase() + "!"
+            deployingValue
         }
-}
-
-def switchBuild(namespace, switchName, configPath) {
-
-    /*println "Switching deployment to " + switchName + "!"
-    sh script: "sed -i \"s|proxy_pass.*\$|proxy_pass http://" + switchName + ";|g\" " + configPath + " "
-    applyK8Config(namespace, configPath)
-    sleep 30
-
-    def podStatus = sh (returnStatus: true, script: "kubectl get pod | grep nginx | awk '{ print \$1 }' &> podName.txt")
-    getPodName = readFile('podName.txt').trim()
-
-    println "Reloading nginx configuration for " + getPodName
-    sh (returnStatus: true, script: "kubectl exec " + getPodName + " -- bash -c 'service nginx reload' &> nginxStatus.txt")
-    getNginxOutput = readFile('nginxStatus.txt').trim()
-
-    println "getNginxOutput : " + getNginxOutput */
-
-
-
 }
 
 def getNameSpace(nsymlPath){
@@ -69,88 +42,58 @@ pipeline {
     agent { label "k8-master" }
 
     environment {
-            /* Should provide firstStackName and secondStackName with convention *_STACK, like QA_STACK and STAGING_STACK to switch deployment between QA and STAGING environment*/
-            firstStackName = 'BLUE_STACK'
-            secondStackName = 'GREEN_STACK'
-            k8configPath = "${WORKSPACE}/install/deploy/kubernetes"
-            namespace = getNameSpace("${k8configPath}/namespace.yaml")
+
             appName = 'config-server'
 
             /* Do not change below this line! */
-            getCurrentValue = ''
+            k8configPath = "${WORKSPACE}/install/deploy/kubernetes"
+            namespace = getNameSpace("${k8configPath}/namespace.yaml")
+
             switchTo  = ''
     }
 
     stages {
 		stage('Clone Repo') {
-			//steps {
-			//	checkout scm
-			//}
 			steps {
+				checkout scm
+			}
+			/*steps {
 			    	checkout([$class: 'GitSCM',
-					branches: [[name: '*/master']],
+					branches: [[name: '/master']],
 					doGenerateSubmoduleConfigurations: false,
 					extensions: [[$class: 'CleanCheckout']],
 					submoduleCfg: [],
-					//userRemoteConfigs: [[credentialsId: 'b2ed5912-90f0-40fb-8f98-a35933a55f30', url: 'https://github.com/nisum-inc/POC_Config_Server.git']]
-					userRemoteConfigs: [[credentialsId: 'b2fd807f-ce8d-4c98-aa74-792f70925e88', url: 'https://github.com/nisum-inc/POC_Config_Server.git']]
+					//userRemoteConfigs: [[credentialsId: 'b2ed5912-90f0-40fb-8f98-a35933a55f30', url: 'https://github.com/nisum-inc/POC_Discovery_Server.git']]
+					userRemoteConfigs: [[credentialsId: 'b2fd807f-ce8d-4c98-aa74-792f70925e88', url: 'https://github.com/nisum-inc/POC_Discovery_Server.git']]
 
 				])
-			}
+			}*/
 		}
-
-
         stage('Create Namespace') {
 		    steps {
 		        script {
-                    applyK8Config("${WORKSPACE}/install/deploy/kubernetes/namespace.yaml")
+                    applyK8Config(env.k8configPath + "/namespace.yaml")
 	    	    }
 	    	}
 		}
-
-        /* This stage will query to existing running svc and get currently poiting value like blue or green! */
-		/*stage('Get Current Deployed Value') {
-		    environment {
-                getCurrentValue = currentDeployedValue(env.namespace, env.firstStackName, env.secondStackName, env.appName)
-                switchTo  = getCurrentValue.toUpperCase()
-		    }
-		    steps {
-		        script {
-                    echo ("getCurrentValue = " + env.getCurrentValue)
-                    echo ("switchTo = " + env.switchTo)
-		        }
-		    }
-		}*/
-
-        /*stage('Clean Deployment') {
-            environment {
-                getCurrentValue = currentDeployedValue(env.namespace, env.firstStackName, env.secondStackName, env.appName)
-                switchTo  = getCurrentValue.toUpperCase()
-            }
-		    steps{
-                script {
-                    //parallel parallelStagesCleanDeployment
-                    deleteK8Config("${env.k8configPath}/${env.appName}-deployment-" + env.getCurrentValue.toLowerCase() + ".yaml")
-                }
-            }
-		}*/
-
 		stage('Apply Deployment') {
 		    environment {
-                getCurrentValue = currentDeployedValue(env.namespace, env.firstStackName, env.secondStackName, env.appName)
-                //switchTo  = getCurrentValue.toUpperCase()
+                switchTo = currentDeployingValue(env.namespace, "blue", "green", env.appName).toLowerCase()
             }
 		    steps {
-                applyK8Config("${env.k8configPath}/${env.appName}-deployment-" + env.getCurrentValue.toLowerCase() + ".yaml")
-                applyK8Config("${env.k8configPath}/${env.appName}-service-" + env.getCurrentValue.toLowerCase() + ".yaml")
+                applyK8Config(env.k8configPath + "/" + env.appName + "-deployment-" + env.switchTo + ".yaml")
+
         	}
         }
-        /*stage('Switch Deployment'){
+        stage('Switch Deployment'){
+		    environment {
+                switchTo = currentDeployingValue(env.namespace, "blue", "green", env.appName).toLowerCase()
+            }
             steps {
                 script {
-                    switchBuild("default", "${env.switchTo}", "${env.k8configPath}/nginx.yaml")
+                    applyK8Config(env.k8configPath + "/" + env.appName + "-service-" + env.switchTo + ".yaml")
                 }
             }
-        }*/
+        }
     }
 }
