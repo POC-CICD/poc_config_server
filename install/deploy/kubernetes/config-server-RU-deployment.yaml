@@ -45,14 +45,14 @@ spec:
         args: ["$(SERVER_PORT)", "$(DISCOVERY_SERVER_URL)", "$(GIT_CONFIG_DIRECTORY)", "-Deureka.instance.preferIpAddress=true", "-Deureka.instance.ipAddress=$(MY_POD_IP)", "-jar", "/usr/src/config-server-SNAPSHOT.jar"]
         readinessProbe:
           tcpSocket:
-            port: 30051
-            host: 127.0.0.1
+            port: 8001
+           # host: 127.0.0.1
           initialDelaySeconds: 5
           periodSeconds: 10
         livenessProbe:
           tcpSocket:
-            port: 30051
-            host: 127.0.0.1
+            port: 8001
+          #  host: 127.0.0.1
           initialDelaySeconds: 15
           periodSeconds: 20
 ---
