@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: config-server
+  namespace: canary
+  labels:
+    app: config-server
+spec:
+  type: NodePort
+  ports:
+  - port: 8001
+    nodePort: 30252
+    targetPort: 8001
+    name: http
+  selector:
+    app: config-server
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: config-server-v1
+  namespace: canary
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: config-server
+        version: config-server-v1
+    spec:
+      containers:
+      - name: config-server
+        image: nisumpk/config_server
+        ports:
+        - containerPort: 8001
+        env:
+        - name: GIT_CONFIG_DIRECTORY
+          value: "-Dspring.cloud.config.server.git.searchPaths=canary"
+        - name: SERVER_PORT
+          value: "-Dserver.port=8001"
+        - name: DISCOVERY_SERVER_URL
+          value: "-Deureka.client.serviceUrl.defaultZone=http://discovery-server:7001/eureka/"
+        command: ["java"]
+        args: ["$(SERVER_PORT)", "$(DISCOVERY_SERVER_URL)", "$(GIT_CONFIG_DIRECTORY)", "-jar", "/usr/src/config-server-SNAPSHOT.jar"]
