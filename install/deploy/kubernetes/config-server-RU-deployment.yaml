@@ -36,13 +36,13 @@ spec:
         - containerPort: 8001
         env:
         - name: GIT_CONFIG_DIRECTORY
-          value: "-Dspring.cloud.config.server.git.searchPaths: cloudstack"
+          value: "-Dspring.cloud.config.server.git.searchPaths=ru-deployment"
         - name: SERVER_PORT
           value: "-Dserver.port=8001"
         - name: DISCOVERY_SERVER_URL
           value: "-Deureka.client.serviceUrl.defaultZone=http://discovery-server-service.ru-deployment.svc.cluster.local:7001/eureka/"
         command: ["java"]
-        args: ["$(SERVER_PORT)", "$(DISCOVERY_SERVER_URL)", "$(GIT_CONFIG_DIRECTORY)", "-Deureka.instance.preferIpAddress=true", "-Deureka.instance.ipAddress=$(MY_POD_IP)", "-jar", "/usr/src/config-server-SNAPSHOT.jar"]
+        args: ["$(SERVER_PORT)", "$(DISCOVERY_SERVER_URL)", "$(GIT_CONFIG_DIRECTORY)", "-Deureka.instance.preferIpAddress=true", "-Deureka.instance.ipAddress=config-server-service", "-jar", "/usr/src/config-server-SNAPSHOT.jar"]
         readinessProbe:
           tcpSocket:
             port: 8001
