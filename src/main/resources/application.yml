@@ -2,7 +2,7 @@ server.port: 8001
 
 spring:
   application.name: config-server
-  cloud.config.server.git.uri: https://github.com/fqadeer-nisum-com/DevOpsPOC-config.git
+  cloud.config.server.git.uri: https://github.com/nisum-inc/POC_Config_Server.git
   cloud.config.server.git.searchPaths: cloudstack
 
 eureka:
