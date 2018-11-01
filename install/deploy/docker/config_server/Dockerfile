@@ -9,5 +9,9 @@ ENV JAR_FILE=config-server-SNAPSHOT.jar
 # Copy all the required files/directories
 COPY ${APP_NAME}/*.jar /usr/src/${JAR_FILE}
 
+# Copy hosted-configuration directory to docker image
+COPY ${APP_NAME}/hosted-configurations /usr/src/hosted-configurations
+
+
 # Startup Command
 ENTRYPOINT java -Dserver.port=${SERVER_PORT} -Deureka.client.serviceUrl.defaultZone=http://$(ping -c1 discovery_server |  grep 'bytes from 172' | cut -d' ' -f 4 | cut -d: -f 1):7001/eureka/ -jar /usr/src/${JAR_FILE}

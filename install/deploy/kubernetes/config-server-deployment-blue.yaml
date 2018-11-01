@@ -27,7 +27,7 @@ spec:
         - containerPort: 8001
         env:
         - name: GIT_CONFIG_DIRECTORY
-          value: "-Dspring.cloud.config.server.git.searchPaths=hosted-configurations/blue"
+          value: "-Dspring.cloud.config.server.git.searchPaths=blue"
         - name: SERVER_PORT
           value: "-Dserver.port=8001"
         - name: DISCOVERY_SERVER_URL

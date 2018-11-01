@@ -46,6 +46,9 @@ pipeline {
                 /* Copying jar file to relavant directory */
                 sh script: "cp ${WORKSPACE}/target/" + app.appName + "*SNAPSHOT.jar ${WORKSPACE}/install/deploy/docker/" + app.appName.replaceAll("-", "_") + "/"
 
+                // Copying hosted-configurations directory to docker build directory
+                sh script: "cp -r ${WORKSPACE}/hosted-configurations ${WORKSPACE}/install/deploy/docker/" + app.appName.replaceAll("-", "_") + "/"
+
                 /* Building docker image */
                 docker.build(registry + "/" + app.appName.replaceAll("-", "_"), "-f ${WORKSPACE}/install/deploy/docker/" + app.appName.replaceAll("-", "_") + "/Dockerfile ${WORKSPACE}/install/deploy/docker")
         }

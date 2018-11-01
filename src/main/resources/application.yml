@@ -2,8 +2,9 @@ server.port: 8001
 
 spring:
   application.name: config-server
-  cloud.config.server.git.uri: https://github.com/nisum-inc/POC_Config_Server.git
-  cloud.config.server.git.searchPaths: hosted-configurations/blue
+#  cloud.config.server.git.uri: https://github.com/nisum-inc/POC_Config_Server.git
+  cloud.config.server.git.uri: file:///usr/src/hosted-configurations
+  cloud.config.server.git.searchPaths: blue
 
 eureka:
   client:
