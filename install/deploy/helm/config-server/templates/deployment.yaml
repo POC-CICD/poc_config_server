@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ include "config-server.fullname" . }}
+  namespace: {{ .Values.service.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "config-server.name" . }}
+        version: {{ .Chart.Version }}
+    spec:
+      containers:
+      - name: {{ include "config-server.name" . }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        ports:
+        - containerPort: {{ .Values.service.port }}
+        env:
+        - name: GIT_CONFIG_DIRECTORY
+          value: "-Dspring.cloud.config.server.git.searchPaths=canary"
+        - name: SERVER_PORT
+          value: "-Dserver.port={{ .Values.service.port }}"
+        - name: DISCOVERY_SERVER_URL
+          value: "-Deureka.client.serviceUrl.defaultZone=http://{{ .Values.discoveryServer.url }}:{{ .Values.discoveryServer.port }}/eureka/"
+        command: ["java"]
+        args: ["$(SERVER_PORT)", "$(DISCOVERY_SERVER_URL)", "$(GIT_CONFIG_DIRECTORY)", "-jar", "/usr/src/config-server-SNAPSHOT.jar"]
+
