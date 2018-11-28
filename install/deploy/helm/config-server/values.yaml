@@ -23,7 +23,7 @@ service:
   namespace: helm
   type: NodePort
   port: 8001
-  nodePort: 32771
+  nodePort: 32751
 
 ingress:
   enabled: false
