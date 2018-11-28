@@ -7,7 +7,7 @@ replicaCount: 1
 deploymentType: BLUEGREEN
 
 discoveryServer:
-  url: discovery-server
+  url: discovery-server-BLUEGREEN
   port: 7001
 
 image:
