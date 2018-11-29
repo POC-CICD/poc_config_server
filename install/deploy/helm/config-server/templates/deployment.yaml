@@ -29,7 +29,7 @@ spec:
         - name: GIT_CONFIG_DIRECTORY
           value: "-Dspring.cloud.config.server.git.searchPaths=cloudstack"
         - name: SERVER_PORT
-          value: "-Dserver.port=8001"
+          value: "-Dserver.port={{ .Values.service.port }}"
         - name: DISCOVERY_SERVER_URL
           value: "-Deureka.client.serviceUrl.defaultZone=http://{{ .Values.discoveryServer.url }}:{{ .Values.discoveryServer.port }}/eureka/"
         command: ["java"]
