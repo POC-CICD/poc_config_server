@@ -6,8 +6,13 @@ replicaCount: 1
 
 deploymentType: BLUEGREEN
 
+application:
+  name: config-server
+  jarPath: /usr/src
+  jarName: config-server-SNAPSHOT.jar
+
 discoveryServer:
-  url: discovery-server-BLUEGREEN
+  url: discovery-server-service
   port: 7001
 
 image:
