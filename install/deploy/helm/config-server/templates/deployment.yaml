@@ -31,6 +31,6 @@ spec:
         - name: SERVER_PORT
           value: "-Dserver.port={{ .Values.service.port }}"
         - name: DISCOVERY_SERVER_URL
-          value: "-Deureka.client.serviceUrl.defaultZone=http://{{ .Values.discoveryServer.url }}:{{ .Values.discoveryServer.port }}/eureka/"
+          value: "-Deureka.client.serviceUrl.defaultZone=http://{{ .Values.discoveryServer.url }}"
         command: ["java"]
         args: ["$(SERVER_PORT)", "$(DISCOVERY_SERVER_URL)", "-Deureka.instance.preferIpAddress=true", "-Deureka.instance.ipAddress={{ .Values.service.name }}", "$(GIT_CONFIG_DIRECTORY)", "-jar", "{{ .Values.application.jarPath }}/{{ .Values.application.jarName }}"]
