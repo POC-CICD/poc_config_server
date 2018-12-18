@@ -12,7 +12,7 @@ application:
   jarName: config-server-SNAPSHOT.jar
 
 discoveryServer:
-  url: discovery-server
+  url: discoveryredblack.redblack.svc.cluster.local:7001/eureka
   port: 7001
 
 image:
