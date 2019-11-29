@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
       - name: config-server
-        image: nisumpk/config_server
+        image: poccicdsaad/config_server
         ports:
         - containerPort: 8001
         env:
